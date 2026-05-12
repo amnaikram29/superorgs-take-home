@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Text, VStack, Spinner } from '@chakra-ui/react';
-import { useColorMode } from '../ui/color-mode';
 import { Plus, MessageSquare } from 'lucide-react';
+import { useColorMode } from '../ui/color-mode';
 import type { Conversation } from '../../api/types';
 
 interface Props {
@@ -23,14 +23,18 @@ function relativeTime(iso: string): string {
 
 export default function Sidebar({ conversations, activeId, loading, onSelect, onNew }: Props) {
   const { colorMode } = useColorMode();
-  const isDark = colorMode === 'dark';
+  const d = colorMode === 'dark';
 
-  const bg = isDark ? '#1a202c' : 'white';
-  const borderColor = isDark ? '#2d3748' : '#e2e8f0';
-  const activeBg = isDark ? '#2d3748' : '#ebf8ff';
-  const activeColor = isDark ? '#90cdf4' : '#2b6cb0';
-  const hoverBg = isDark ? '#2d3748' : '#f7fafc';
-  const mutedColor = isDark ? '#718096' : '#a0aec0';
+  const bg          = d ? '#0f1117'  : '#ffffff';
+  const border      = d ? '#1e2533'  : '#e2e8f0';
+  const titleColor  = d ? '#ffffff'  : '#1a202c';
+  const activeBg    = d ? '#1e2d3d'  : '#ebf8ff';
+  const activeColor = d ? '#63b3ed'  : '#2b6cb0';
+  const itemColor   = d ? '#cbd5e0'  : '#2d3748';
+  const hoverBg     = d ? '#1a2332'  : '#f7fafc';
+  const mutedColor  = d ? '#718096'  : '#a0aec0';
+  const btnColor    = d ? '#a0aec0'  : '#718096';
+  const btnHoverBg  = d ? '#1e2533'  : '#edf2f7';
 
   return (
     <Flex
@@ -40,31 +44,30 @@ export default function Sidebar({ conversations, activeId, loading, onSelect, on
       h="100vh"
       bg={bg}
       borderRight="1px solid"
-      borderColor={borderColor}
+      borderColor={border}
       py={4}
     >
-      {/* Header */}
       <Flex align="center" justify="space-between" px={4} mb={4}>
         <Flex align="center" gap={2}>
           <MessageSquare size={16} color="#4299e1" />
-          <Text fontWeight="700" fontSize="sm" letterSpacing="wide">
+          <Text fontWeight="700" fontSize="sm" letterSpacing="wide" color={titleColor}>
             S&P 500 Chat
           </Text>
         </Flex>
         <Button
           size="xs"
           variant="ghost"
-          colorPalette="blue"
           onClick={onNew}
           aria-label="New conversation"
           px={2}
+          color={btnColor}
+          _hover={{ color: titleColor, bg: btnHoverBg }}
         >
           <Plus size={12} />
           New
         </Button>
       </Flex>
 
-      {/* Conversation list */}
       <Box flex={1} overflowY="auto" px={2}>
         {loading ? (
           <Flex justify="center" pt={8}>
@@ -80,7 +83,7 @@ export default function Sidebar({ conversations, activeId, loading, onSelect, on
                   variant="ghost"
                   justifyContent="flex-start"
                   bg={isActive ? activeBg : 'transparent'}
-                  color={isActive ? activeColor : 'inherit'}
+                  color={isActive ? activeColor : itemColor}
                   _hover={{ bg: isActive ? activeBg : hoverBg }}
                   onClick={() => onSelect(conv.id)}
                   px={3}
@@ -90,12 +93,7 @@ export default function Sidebar({ conversations, activeId, loading, onSelect, on
                   fontWeight={isActive ? '600' : '400'}
                 >
                   <Flex direction="column" align="flex-start" w="full" overflow="hidden">
-                    <Text
-                      fontSize="sm"
-                      lineClamp={1}
-                      textAlign="left"
-                      w="full"
-                    >
+                    <Text fontSize="sm" lineClamp={1} textAlign="left" w="full">
                       {conv.title ?? 'New conversation'}
                     </Text>
                     <Text fontSize="xs" color={mutedColor} mt={0.5}>

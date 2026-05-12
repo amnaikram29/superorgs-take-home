@@ -2,9 +2,7 @@ import { Box, Table, Text } from '@chakra-ui/react';
 import { useColorMode } from '../ui/color-mode';
 import type { TableResult } from '../../api/types';
 
-interface Props {
-  data: TableResult;
-}
+interface Props { data: TableResult }
 
 function formatCell(value: unknown): string {
   if (value === null || value === undefined) return '—';
@@ -17,25 +15,36 @@ function formatCell(value: unknown): string {
 
 export default function TableRenderer({ data }: Props) {
   const { colorMode } = useColorMode();
-  const isDark = colorMode === 'dark';
-  const headerBg = isDark ? '#2d3748' : '#f7fafc';
-  const borderColor = isDark ? '#4a5568' : '#e2e8f0';
-  const hoverBg = isDark ? '#2d3748' : '#f7fafc';
+  const d = colorMode === 'dark';
+
+  const titleColor  = d ? '#718096'  : '#718096';
+  const border      = d ? '#2d3748'  : '#e2e8f0';
+  const headerBg    = d ? '#1e2533'  : '#f7fafc';
+  const headerColor = d ? '#718096'  : '#4a5568';
+  const rowEven     = d ? '#131720'  : '#ffffff';
+  const rowOdd      = d ? '#161c27'  : '#f8fafc';
+  const rowHover    = d ? '#1e2d3d'  : '#ebf8ff';
+  const cellColor   = d ? '#e2e8f0'  : '#2d3748';
+  const scrollThumb = d ? '#4a5568'  : '#cbd5e0';
 
   return (
     <Box w="full" maxW="700px">
       {data.title && (
-        <Text fontSize="sm" fontWeight="600" mb={2} color="gray.500">
+        <Text fontSize="sm" fontWeight="600" mb={2} color={titleColor}>
           {data.title}
         </Text>
       )}
       <Box
         border="1px solid"
-        borderColor={borderColor}
+        borderColor={border}
         borderRadius="lg"
         overflow="hidden"
         maxH="320px"
         overflowY="auto"
+        css={{
+          '&::-webkit-scrollbar': { width: '4px' },
+          '&::-webkit-scrollbar-thumb': { background: scrollThumb, borderRadius: '2px' },
+        }}
       >
         <Table.Root size="sm">
           <Table.Header bg={headerBg} position="sticky" top={0} zIndex={1}>
@@ -46,9 +55,10 @@ export default function TableRenderer({ data }: Props) {
                   fontSize="xs"
                   textTransform="uppercase"
                   letterSpacing="wider"
-                  color="gray.500"
-                  borderColor={borderColor}
+                  color={headerColor}
+                  borderColor={border}
                   whiteSpace="nowrap"
+                  py={2}
                 >
                   {col}
                 </Table.ColumnHeader>
@@ -57,12 +67,17 @@ export default function TableRenderer({ data }: Props) {
           </Table.Header>
           <Table.Body>
             {data.rows.map((row, i) => (
-              <Table.Row key={i} _hover={{ bg: hoverBg }}>
+              <Table.Row
+                key={i}
+                bg={i % 2 === 0 ? rowEven : rowOdd}
+                _hover={{ bg: rowHover }}
+              >
                 {data.columns.map((col) => (
                   <Table.Cell
                     key={col}
                     fontSize="sm"
-                    borderColor={borderColor}
+                    color={cellColor}
+                    borderColor={border}
                     whiteSpace="nowrap"
                   >
                     {formatCell(row[col])}

@@ -1,8 +1,8 @@
 import { Flex, Textarea, IconButton, Box } from '@chakra-ui/react';
-import { useColorMode } from '../ui/color-mode';
 import { ArrowUp, Square } from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
 import type { KeyboardEvent } from 'react';
+import { useColorMode } from '../ui/color-mode';
 
 interface Props {
   onSend: (text: string) => void;
@@ -15,11 +15,14 @@ export default function InputBar({ onSend, onStop, streaming, disabled }: Props)
   const [value, setValue] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { colorMode } = useColorMode();
-  const isDark = colorMode === 'dark';
+  const d = colorMode === 'dark';
 
-  const borderColor = isDark ? '#4a5568' : '#e2e8f0';
-  const bg = isDark ? '#1a202c' : 'white';
-  const wrapperBg = isDark ? '#2d3748' : '#f7fafc';
+  const wrapperBorder  = d ? '#2d3748' : '#e2e8f0';
+  const outerBg        = d ? '#131720' : '#ffffff';
+  const innerBg        = d ? '#1a2033' : '#f7fafc';
+  const textColor      = d ? '#e2e8f0' : '#1a202c';
+  const placeholderClr = d ? '#4a5568' : '#a0aec0';
+  const hintColor      = d ? '#4a5568' : '#a0aec0';
 
   const submit = useCallback(() => {
     const text = value.trim();
@@ -39,16 +42,21 @@ export default function InputBar({ onSend, onStop, streaming, disabled }: Props)
   );
 
   return (
-    <Box px={4} py={3} borderTop="1px solid" borderColor={borderColor} bg={bg}>
+    <Box
+      px={4} py={3}
+      borderTop="1px solid"
+      borderColor={wrapperBorder}
+      bg={outerBg}
+    >
       <Flex
         align="flex-end"
         gap={2}
         border="1px solid"
-        borderColor={borderColor}
+        borderColor={wrapperBorder}
         borderRadius="xl"
         p={2}
-        bg={wrapperBg}
-        _focusWithin={{ borderColor: 'blue.400' }}
+        bg={innerBg}
+        _focusWithin={{ borderColor: '#4299e1' }}
         transition="border-color 0.15s"
       >
         <Textarea
@@ -62,6 +70,7 @@ export default function InputBar({ onSend, onStop, streaming, disabled }: Props)
           border="none"
           outline="none"
           _focus={{ boxShadow: 'none', borderColor: 'transparent' }}
+          _placeholder={{ color: placeholderClr }}
           minH="40px"
           maxH="160px"
           rows={1}
@@ -71,6 +80,7 @@ export default function InputBar({ onSend, onStop, streaming, disabled }: Props)
           flex={1}
           disabled={disabled}
           bg="transparent"
+          color={textColor}
         />
         {streaming ? (
           <IconButton
@@ -97,7 +107,7 @@ export default function InputBar({ onSend, onStop, streaming, disabled }: Props)
         )}
       </Flex>
       <Flex justify="flex-end" mt={1}>
-        <Box fontSize="xs" color="gray.500">
+        <Box fontSize="xs" color={hintColor}>
           Enter to send · Shift+Enter for newline
         </Box>
       </Flex>

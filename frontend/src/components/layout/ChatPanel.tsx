@@ -1,6 +1,6 @@
 import { Box, Flex, Spinner } from '@chakra-ui/react';
-import { useColorMode } from '../ui/color-mode';
 import { useEffect, useRef } from 'react';
+import { useColorMode } from '../ui/color-mode';
 import type { Message, LiveMessage } from '../../api/types';
 import MessageBubble from '../messages/MessageBubble';
 import EmptyState from '../messages/EmptyState';
@@ -16,17 +16,12 @@ interface Props {
 }
 
 export default function ChatPanel({
-  messages,
-  liveMessage,
-  streaming,
-  loadingHistory,
-  onSend,
-  onStop,
+  messages, liveMessage, streaming, loadingHistory, onSend, onStop,
 }: Props) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const { colorMode } = useColorMode();
-  const isDark = colorMode === 'dark';
-  const bg = isDark ? '#131720' : '#f7fafc';
+  const d = colorMode === 'dark';
+  const bg = d ? '#131720' : '#f8fafc';
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -42,7 +37,10 @@ export default function ChatPanel({
         py={6}
         css={{
           '&::-webkit-scrollbar': { width: '6px' },
-          '&::-webkit-scrollbar-thumb': { background: '#718096', borderRadius: '3px' },
+          '&::-webkit-scrollbar-thumb': {
+            background: d ? '#2d3748' : '#cbd5e0',
+            borderRadius: '3px',
+          },
         }}
       >
         {loadingHistory ? (

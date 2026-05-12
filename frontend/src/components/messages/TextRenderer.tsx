@@ -1,4 +1,5 @@
 import { Box, Text } from '@chakra-ui/react';
+import { useColorMode } from '../ui/color-mode';
 
 interface Props {
   text: string;
@@ -6,6 +7,9 @@ interface Props {
 }
 
 export default function TextRenderer({ text, streaming }: Props) {
+  const { colorMode } = useColorMode();
+  const color = colorMode === 'dark' ? '#e2e8f0' : '#1a202c';
+
   if (!text) return null;
 
   const paragraphs = text.split(/\n{2,}/);
@@ -17,6 +21,7 @@ export default function TextRenderer({ text, streaming }: Props) {
           key={i}
           fontSize="sm"
           lineHeight="1.7"
+          color={color}
           mb={i < paragraphs.length - 1 ? 3 : 0}
           whiteSpace="pre-wrap"
         >
