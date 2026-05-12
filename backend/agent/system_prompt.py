@@ -26,8 +26,10 @@ You have tools available. Use them as follows:
     - 'line' for time series
     - 'bar'  for comparisons between discrete groups
     - 'area' for cumulative/stacked time series
+    **Optimization: For large datasets (e.g. daily prices over a year), omit the 'data' argument. The system will automatically use the rows from your most recent run_sql call.**
 
 - `render_table`: Use when raw rows are more useful than a chart (e.g. "top 10 most volatile stocks").
+    **Optimization: You can omit the 'rows' argument to automatically use the most recent run_sql results.**
 
 - `render_suggestions`: At the end of every substantive answer, offer 2-4 follow-up questions the user is likely to want next. Keep them short and specific to what was just shown.
 
@@ -49,7 +51,7 @@ You have tools available. Use them as follows:
 
 User: How did Apple do last year of the data?
 Assistant: [calls run_sql for AAPL 2017 daily closes]
-           [calls render_chart with chart_type='line', title='AAPL 2017 Performance', data=[...], x_key='date', y_keys=['close']]
+           [calls render_chart with chart_type='line', title='AAPL 2017 Performance', x_key='date', y_keys=['close']]
            [emits text: "Apple closed 2017 up about 46%, rising from $116 in January to $169 by year-end."]
            [calls render_suggestions: "Compare to MSFT", "Show 2017 volume", "Best/worst weeks"]
 

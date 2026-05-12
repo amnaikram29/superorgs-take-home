@@ -84,6 +84,19 @@ def run(
                     call_id = event["call_id"]
                     tool_name = event["tool_name"]
                     tool_input = event["input"]
+                    
+                    # Auto-inject results from most recent run_sql if data/rows are missing
+                    if tool_name == "render_chart" and "data" not in tool_input:
+                        last_sql_result = next((p["result"] for p in reversed(all_parts) if p.get("type") == "tool_call" and p.get("tool_name") == "run_sql"), None)
+                        if last_sql_result and isinstance(last_sql_result, dict) and "rows" in last_sql_result:
+                            tool_input["data"] = last_sql_result["rows"]
+                            logger.info(f"Auto-injected {len(tool_input['data'])} rows into render_chart")
+
+                    if tool_name == "render_table" and "rows" not in tool_input:
+                        last_sql_result = next((p["result"] for p in reversed(all_parts) if p.get("type") == "tool_call" and p.get("tool_name") == "run_sql"), None)
+                        if last_sql_result and isinstance(last_sql_result, dict) and "rows" in last_sql_result:
+                            tool_input["rows"] = last_sql_result["rows"]
+                            logger.info(f"Auto-injected {len(tool_input['rows'])} rows into render_table")
 
                     if current_text_buf.strip():
                         part = {"type": "text", "text": current_text_buf}

@@ -2,7 +2,7 @@ import json
 from typing import Optional
 
 # Max rows to replay inline for old tool results (avoids context bloat)
-REPLAY_ROW_LIMIT = 50
+REPLAY_ROW_LIMIT = 1000
 
 
 def db_messages_to_provider_messages(db_messages: list[dict]) -> list[dict]:

@@ -26,7 +26,7 @@ class OpenAIProvider(BaseLLMProvider):
             model=self.model,
             messages=openai_messages,
             stream=True,
-            max_tokens=4096,
+            max_tokens=8192,
         )
         if tools:
             kwargs["tools"] = tools

@@ -1,6 +1,7 @@
 import { Box, Text } from '@chakra-ui/react';
+import { useEffect, useRef, useState } from 'react';
 import {
-  ResponsiveContainer, LineChart, BarChart, AreaChart,
+  LineChart, BarChart, AreaChart,
   Line, Bar, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
 import { useColorMode } from '../ui/color-mode';
@@ -14,7 +15,7 @@ function formatTick(value: unknown): string {
   if (typeof value === 'string' && value.length === 10 && value.includes('-')) return value.slice(5);
   if (typeof value === 'number') {
     if (Math.abs(value) >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
-    if (Math.abs(value) >= 1_000)     return `${(value / 1_000).toFixed(0)}K`;
+    if (Math.abs(value) >= 1_000) return `${(value / 1_000).toFixed(0)}K`;
     return value.toFixed(2);
   }
   return String(value);
@@ -24,12 +25,25 @@ export default function ChartRenderer({ data }: Props) {
   const { colorMode } = useColorMode();
   const d = colorMode === 'dark';
 
-  const gridColor  = d ? '#1e2533' : '#e2e8f0';
-  const axisColor  = d ? '#718096' : '#718096';
-  const tooltipBg  = d ? '#1a2033' : '#ffffff';
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number>(0);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver((entries) => {
+      setWidth(entries[0].contentRect.width);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const gridColor = d ? '#1e2533' : '#e2e8f0';
+  const axisColor = d ? '#718096' : '#718096';
+  const tooltipBg = d ? '#1a2033' : '#ffffff';
   const tooltipBrd = d ? '#2d3748' : '#e2e8f0';
   const tooltipTxt = d ? '#e2e8f0' : '#1a202c';
-  const legendClr  = d ? '#a0aec0' : '#4a5568';
+  const legendClr = d ? '#a0aec0' : '#4a5568';
   const titleColor = d ? '#718096' : '#718096';
 
   const axisStyle = { fontSize: 11, fill: axisColor };
@@ -88,21 +102,23 @@ export default function ChartRenderer({ data }: Props) {
 
   const ChartComp =
     data.chart_type === 'line' ? LineChart :
-    data.chart_type === 'bar'  ? BarChart  : AreaChart;
+      data.chart_type === 'bar' ? BarChart : AreaChart;
 
   return (
-    <Box w="full" maxW="700px">
+    <Box w="full" minW={0} display="block">
       {data.title && (
         <Text fontSize="sm" fontWeight="600" mb={2} color={titleColor}>
           {data.title}
         </Text>
       )}
-      <ResponsiveContainer width="100%" height={280}>
-        <ChartComp {...commonProps}>
-          {axes}
-          {series}
-        </ChartComp>
-      </ResponsiveContainer>
+      <Box ref={containerRef} w="full" display="block">
+        {width > 0 && (
+          <ChartComp {...commonProps} width={width} height={280}>
+            {axes}
+            {series}
+          </ChartComp>
+        )}
+      </Box>
     </Box>
   );
 }

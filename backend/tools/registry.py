@@ -64,7 +64,10 @@ TOOLS = {
                 "data": {
                     "type": "array",
                     "items": {"type": "object"},
-                    "description": "Array of row objects from run_sql (or hand-pivoted).",
+                    "description": (
+                        "Optional. Array of row objects from run_sql. "
+                        "If omitted, the system automatically uses the most recent run_sql results."
+                    ),
                 },
                 "x_key": {"type": "string", "description": "Column name for the x-axis."},
                 "y_keys": {
@@ -75,7 +78,7 @@ TOOLS = {
                 "x_label": {"type": "string"},
                 "y_label": {"type": "string"},
             },
-            "required": ["chart_type", "title", "data", "x_key", "y_keys"],
+            "required": ["chart_type", "title", "x_key", "y_keys"],
         },
     },
     "render_table": {
@@ -96,10 +99,13 @@ TOOLS = {
                 "rows": {
                     "type": "array",
                     "items": {"type": "object"},
-                    "description": "Row objects matching the columns.",
+                    "description": (
+                        "Optional. Row objects matching the columns. "
+                        "If omitted, the system automatically uses the most recent run_sql results."
+                    ),
                 },
             },
-            "required": ["title", "columns", "rows"],
+            "required": ["title", "columns"],
         },
     },
     "render_suggestions": {

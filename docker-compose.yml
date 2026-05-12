@@ -5,15 +5,24 @@ services:
     ports:
       - "5000:5000"
     volumes:
+      - ./backend:/app
       - ./data:/app/data
     env_file: .env
+    environment:
+      - FLASK_DEBUG=true
     restart: unless-stopped
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      target: builder
     container_name: sp500-frontend
     ports:
       - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
     depends_on:
       - backend
+    command: npm run dev
     restart: unless-stopped
