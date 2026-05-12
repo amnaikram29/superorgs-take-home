@@ -47,7 +47,9 @@ TOOLS = {
     "render_chart": {
         "description": (
             "Render a chart in the UI. Use for trends over time (line), comparisons between "
-            "discrete groups (bar), or cumulative series (area). Pass the data rows directly."
+            "discrete groups (bar), or cumulative series (area). Pass the data rows directly. "
+            "You MUST specify x_key (column name for x-axis) and y_keys (array of column names for y-axis) "
+            "that exist in the data objects."
         ),
         "handler": render_chart_handler,
         "schema": {

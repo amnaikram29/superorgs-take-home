@@ -1,6 +1,9 @@
 import json
+import logging
 from flask import Blueprint, request, Response, stream_with_context, current_app
 from db import chat as chat_db
+
+logger = logging.getLogger(__name__)
 
 chat_bp = Blueprint("chat", __name__)
 
@@ -10,6 +13,8 @@ def chat():
     body = request.get_json(force=True)
     conv_id = body.get("conversation_id")
     user_text = body.get("message", "").strip()
+
+    logger.info(f"Received chat request for conv_id: {conv_id}")
 
     if not conv_id or not user_text:
         return {"error": "conversation_id and message are required."}, 400

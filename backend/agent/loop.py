@@ -1,5 +1,8 @@
 import json
+import logging
 from typing import Iterator
+
+logger = logging.getLogger(__name__)
 
 from agent.system_prompt import build_system_prompt
 from agent.history import db_messages_to_provider_messages, parts_to_provider_turns
@@ -19,6 +22,7 @@ def run(
     Persists user message and final assistant message to DB.
     """
     # Save user message
+    logger.info(f"Starting agent loop for conv_id: {conv_id}. User message: {user_text[:50]}...")
     chat_db.save_message(conv_id, "user", [{"type": "text", "text": user_text}])
 
     system_prompt = build_system_prompt()
@@ -39,6 +43,7 @@ def run(
     all_parts: list[dict] = []
 
     for iteration in range(1, MAX_ITERATIONS + 1):
+        logger.info(f"Iteration {iteration}/{MAX_ITERATIONS} for conv_id: {conv_id}")
         has_tool_calls = False
         stop_reason = None
 
@@ -61,6 +66,7 @@ def run(
 
                 elif etype == "tool_call_start":
                     has_tool_calls = True
+                    logger.info(f"Tool call start: {event['tool_name']} (id: {event['call_id']})")
                     yield {
                         "type": "tool_start",
                         "call_id": event["call_id"],
@@ -96,6 +102,7 @@ def run(
                     current_parts.append(part)
                     all_parts.append(part)
 
+                    logger.info(f"Tool result: {tool_name} (id: {call_id})")
                     yield {
                         "type": "tool_result",
                         "call_id": call_id,
@@ -121,8 +128,25 @@ def run(
             completed_iterations.append(list(current_parts))
             current_parts = []
 
-        # Only re-enter when the model explicitly wants tool results
+        # Only re-enter when the model explicitly wants tool results.
+        # However, if the model stops without producing any user-visible content
+        # (text or visual tools) after fetching data, we force it to continue
+        # one more time with a reminder.
         if stop_reason != "tool_use":
+            has_visible = any(
+                p["type"] == "text" or (p["type"] == "tool_call" and p["tool_name"] != "run_sql")
+                for p in all_parts
+            )
+            if not has_visible and iteration < MAX_ITERATIONS:
+                # Find if we have any successful SQL results to talk about
+                has_data = any(p["type"] == "tool_call" and p["tool_name"] == "run_sql" and "result" in p for p in all_parts)
+                if has_data:
+                    logger.info(f"No visible content produced after SQL. Nudging model (conv_id: {conv_id})")
+                    # Inject a "virtual" turn to nudge the model
+                    reminder_parts = [{"type": "text", "text": "(System reminder: You fetched data but haven't shown it to the user. Use render_table/render_chart/render_kpi or provide a summary.)"}]
+                    completed_iterations.append(reminder_parts)
+                    continue
+            logger.info(f"Exiting loop for conv_id: {conv_id}. Stop reason: {stop_reason}")
             break
 
     else:
