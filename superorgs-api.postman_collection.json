@@ -1,0 +1,255 @@
+{
+  "info": {
+    "name": "SuperOrgs API",
+    "_postman_id": "superorgs-take-home-collection",
+    "description": "Postman collection for the SuperOrgs take-home Flask API. Base URL defaults to http://localhost:5000. Change the `baseUrl` variable if your server runs on a different host/port.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "conversationId",
+      "value": "",
+      "type": "string",
+      "description": "Populated automatically by the 'Create Conversation' request's test script."
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Returns `{\"status\": \"ok\"}` if the server is up."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"status\": \"ok\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Conversations",
+      "item": [
+        {
+          "name": "List Conversations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations"]
+            },
+            "description": "Returns an array of all conversations. Each item has `id`, `title`, `created_at`, and `updated_at`."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "[\n  {\n    \"id\": \"<uuid>\",\n    \"title\": \"My Conversation\",\n    \"created_at\": \"2026-05-12T18:00:00Z\",\n    \"updated_at\": \"2026-05-12T18:00:00Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Create Conversation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "    pm.collectionVariables.set('conversationId', json.id);",
+                  "    console.log('conversationId set to: ' + json.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My Test Conversation\"\n}",
+              "options": {
+                "raw": { "language": "json" }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations"]
+            },
+            "description": "Creates a new conversation. `title` is optional. Returns 201 with the new conversation object. The test script automatically saves the returned `id` into the `conversationId` collection variable."
+          },
+          "response": [
+            {
+              "name": "201 Created",
+              "status": "Created",
+              "code": 201,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"id\": \"<uuid>\",\n  \"title\": \"My Test Conversation\",\n  \"created_at\": \"2026-05-12T18:00:00Z\",\n  \"updated_at\": \"2026-05-12T18:00:00Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Conversation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations", "{{conversationId}}"]
+            },
+            "description": "Fetches a single conversation by ID. Returns 404 with `{\"error\": \"Not found.\"}` if the conversation does not exist."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"id\": \"<uuid>\",\n  \"title\": \"My Test Conversation\",\n  \"created_at\": \"2026-05-12T18:00:00Z\",\n  \"updated_at\": \"2026-05-12T18:00:00Z\"\n}"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"error\": \"Not found.\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get Conversation Messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/conversations/{{conversationId}}/messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "conversations", "{{conversationId}}", "messages"]
+            },
+            "description": "Returns all messages for a conversation. Each message has `id`, `conversation_id`, `role`, `content` (structured parts array), and `created_at`. Returns 404 if the conversation does not exist."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "[\n  {\n    \"id\": \"<uuid>\",\n    \"conversation_id\": \"<uuid>\",\n    \"role\": \"user\",\n    \"content\": [{\"type\": \"text\", \"text\": \"Hello\"}],\n    \"created_at\": \"2026-05-12T18:00:00Z\"\n  },\n  {\n    \"id\": \"<uuid>\",\n    \"conversation_id\": \"<uuid>\",\n    \"role\": \"assistant\",\n    \"content\": [{\"type\": \"text\", \"text\": \"Hi! How can I help?\"}],\n    \"created_at\": \"2026-05-12T18:00:01Z\"\n  }\n]"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"error\": \"Not found.\"\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Send Chat Message (SSE)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Accept", "value": "text/event-stream" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"conversation_id\": \"{{conversationId}}\",\n  \"message\": \"What are the top 5 organizations by revenue?\"\n}",
+              "options": {
+                "raw": { "language": "json" }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat"]
+            },
+            "description": "Sends a user message to the agent and streams the response as Server-Sent Events (SSE).\n\n**Request body:**\n- `conversation_id` (string, required) — must reference an existing conversation.\n- `message` (string, required) — the user's message; cannot be blank.\n\n**Streaming response** (`text/event-stream`):\nEach SSE event is `data: <json>\\n\\n`. Event types include:\n- `{\"type\": \"text_delta\", \"text\": \"...\"}` — incremental assistant text.\n- `{\"type\": \"tool_start\", ...}` — agent called a tool.\n- `{\"type\": \"tool_input\", ...}` — tool input data.\n- `{\"type\": \"error\", \"message\": \"...\"}` — an error occurred.\n\n**Error responses (non-streaming):**\n- `400` — `conversation_id` or `message` missing/empty.\n- `404` — conversation not found.\n\n**Note:** Postman will buffer the entire SSE stream before showing a response. To see events in real time, use `curl` or a browser `EventSource`."
+          },
+          "response": [
+            {
+              "name": "400 Bad Request – missing fields",
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"error\": \"conversation_id is required.\"\n}"
+            },
+            {
+              "name": "404 Not Found – conversation missing",
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                { "key": "Content-Type", "value": "application/json" }
+              ],
+              "body": "{\n  \"error\": \"Not found.\"\n}"
+            },
+            {
+              "name": "200 OK – SSE stream example",
+              "status": "OK",
+              "code": 200,
+              "header": [
+                { "key": "Content-Type", "value": "text/event-stream" },
+                { "key": "Cache-Control", "value": "no-cache" },
+                { "key": "X-Accel-Buffering", "value": "no" },
+                { "key": "Access-Control-Allow-Origin", "value": "*" }
+              ],
+              "body": "data: {\"type\": \"text_delta\", \"text\": \"Here are the top 5 organizations\"}\n\ndata: {\"type\": \"text_delta\", \"text\": \" by revenue:\"}\n\n"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
