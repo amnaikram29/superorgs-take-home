@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    container_name: sp500-backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/app/data
+    env_file: .env
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    container_name: sp500-frontend
+    profiles: ["frontend"]
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+    restart: unless-stopped
