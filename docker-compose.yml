@@ -12,7 +12,6 @@ services:
   frontend:
     build: ./frontend
     container_name: sp500-frontend
-    profiles: ["frontend"]
     ports:
       - "3000:3000"
     depends_on:
