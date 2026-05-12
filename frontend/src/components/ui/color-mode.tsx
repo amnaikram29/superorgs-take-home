@@ -15,7 +15,9 @@ export type ColorMode = 'light' | 'dark';
 
 export function useColorMode(): { colorMode: ColorMode; toggleColorMode: () => void } {
   const { resolvedTheme, setTheme } = useTheme();
-  const colorMode: ColorMode = resolvedTheme === 'dark' ? 'dark' : 'light';
+  // Default to dark — resolvedTheme is undefined before next-themes hydrates,
+  // and we force dark mode globally so this should always be 'dark'.
+  const colorMode: ColorMode = resolvedTheme === 'light' ? 'light' : 'dark';
   const toggleColorMode = () => setTheme(colorMode === 'dark' ? 'light' : 'dark');
   return { colorMode, toggleColorMode };
 }

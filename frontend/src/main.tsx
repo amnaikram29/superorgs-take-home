@@ -9,7 +9,7 @@ import './index.css';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ChakraProvider value={system}>
-      <ColorModeProvider defaultTheme="dark">
+      <ColorModeProvider defaultTheme="light" enableSystem={false}>
         <App />
       </ColorModeProvider>
     </ChakraProvider>

@@ -1,7 +1,7 @@
 import { Flex, IconButton, Box } from '@chakra-ui/react';
 import { Moon, Sun } from 'lucide-react';
-import { useColorMode } from '../ui/color-mode';
 import { useEffect } from 'react';
+import { useColorMode } from '../ui/color-mode';
 import Sidebar from './Sidebar';
 import ChatPanel from './ChatPanel';
 import { useConversations } from '../../hooks/useConversations';
@@ -53,6 +53,8 @@ export default function AppShell() {
           right={4}
           zIndex={10}
           onClick={toggleColorMode}
+          color={colorMode === 'dark' ? '#a0aec0' : '#4a5568'}
+          _hover={{ bg: colorMode === 'dark' ? '#1e2533' : '#edf2f7' }}
         >
           {colorMode === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
         </IconButton>
