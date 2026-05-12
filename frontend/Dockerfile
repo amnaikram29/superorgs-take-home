@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy manifests first for layer caching
 COPY package.json package-lock.json* ./
 
-# Install all deps (Linux env — gets the linux rolldown binding automatically)
+# Install all deps (Linux/Node 20 — consistent with node:20-alpine)
 RUN npm install --ignore-scripts=false
 
 COPY . .

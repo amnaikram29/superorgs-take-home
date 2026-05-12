@@ -133,25 +133,29 @@ if (Test-Path $envFile) {
 
 # ── 6. Build and start ────────────────────────────────────────────────────────
 Write-Host ""
-Write-Info "Building and starting backend..."
+Write-Info "Building and starting backend + frontend (this may take a few minutes on first run)..."
 Write-Host ""
 
 Set-Location $RepoRoot
 docker compose up --build -d
 
 Write-Host ""
-Write-Host "==============================" -ForegroundColor Green
-Write-Host "  Backend is starting up!" -ForegroundColor Green
-Write-Host "==============================" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
+Write-Host "  S&P 500 Analytics is starting up!" -ForegroundColor Green
+Write-Host "========================================" -ForegroundColor Green
 Write-Host ""
+Write-Host "  Frontend:     http://localhost:3000" -ForegroundColor Cyan
 Write-Host "  Backend API:  http://localhost:5000" -ForegroundColor Cyan
 Write-Host "  Health check: http://localhost:5000/health" -ForegroundColor Cyan
 Write-Host ""
+Write-Host "  Note: The first start seeds the database (~619k rows)." -ForegroundColor Yellow
+Write-Host "        The frontend will be ready in ~30-60 seconds." -ForegroundColor Yellow
+Write-Host ""
 Write-Host "  Useful commands:" -ForegroundColor White
-Write-Host "    docker compose logs -f backend     # stream logs"
+Write-Host "    docker compose logs -f             # stream all logs"
+Write-Host "    docker compose logs -f frontend    # frontend logs only"
+Write-Host "    docker compose logs -f backend     # backend logs only"
 Write-Host "    docker compose down                # stop everything"
 Write-Host "    docker compose up -d               # start again (no rebuild)"
-Write-Host ""
-Write-Host "  To start the frontend (once built):"
-Write-Host "    docker compose --profile frontend up -d"
+Write-Host "    docker compose up --build -d       # rebuild and start"
 Write-Host ""
