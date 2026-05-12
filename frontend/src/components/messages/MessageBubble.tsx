@@ -48,9 +48,6 @@ export default function MessageBubble({ message, streaming, onSend }: Props) {
 
   const parts = 'content' in message ? message.content : message.parts;
 
-  // Parts that actually render visible content:
-  // - text / live_text with non-empty text
-  // - tool_call / live_tool that aren't run_sql (which always returns null)
   const hasVisibleContent = parts.some((p) => {
     if (p.type === 'text') return !!p.text;
     if (p.type === 'live_text') return !!p.text;
@@ -59,13 +56,21 @@ export default function MessageBubble({ message, streaming, onSend }: Props) {
     return false;
   });
 
+  const hasWideContent = parts.some((p) => {
+    const r = (p.type === 'tool_call' || p.type === 'live_tool') ? p.result : null;
+    const res = r as any;
+    return res?.type === 'chart' || res?.type === 'table';
+  });
+
   const isWaiting = !isUser && streaming && !hasVisibleContent;
 
   return (
     <Flex justify={isUser ? 'flex-end' : 'flex-start'} mb={4} px={2}>
       <Box
         maxW={isUser ? '75%' : '90%'}
+        w={(!isUser && hasWideContent) ? 'full' : 'auto'}
         bg={isUser ? userBg : assistantBg}
+
         color={isUser ? (d ? '#ffffff' : '#1a202c') : (d ? '#e2e8f0' : '#1a202c')}
         border={isUser ? 'none' : '1px solid'}
         borderColor={isUser ? undefined : assistantBorder}

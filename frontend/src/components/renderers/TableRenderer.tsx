@@ -28,7 +28,7 @@ export default function TableRenderer({ data }: Props) {
   const scrollThumb = d ? '#4a5568'  : '#cbd5e0';
 
   return (
-    <Box w="full" maxW="700px">
+    <Box w="full">
       {data.title && (
         <Text fontSize="sm" fontWeight="600" mb={2} color={titleColor}>
           {data.title}

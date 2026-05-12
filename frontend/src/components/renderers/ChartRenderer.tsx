@@ -1,7 +1,6 @@
 import { Box, Text } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
 import {
-  LineChart, BarChart, AreaChart,
+  ResponsiveContainer, LineChart, BarChart, AreaChart,
   Line, Bar, Area, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
 } from 'recharts';
 import { useColorMode } from '../ui/color-mode';
@@ -24,19 +23,6 @@ function formatTick(value: unknown): string {
 export default function ChartRenderer({ data }: Props) {
   const { colorMode } = useColorMode();
   const d = colorMode === 'dark';
-
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState<number>(0);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver((entries) => {
-      setWidth(entries[0].contentRect.width);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
 
   const gridColor = d ? '#1e2533' : '#e2e8f0';
   const axisColor = d ? '#718096' : '#718096';
@@ -105,19 +91,19 @@ export default function ChartRenderer({ data }: Props) {
       data.chart_type === 'bar' ? BarChart : AreaChart;
 
   return (
-    <Box w="full" minW={0} display="block">
+    <Box w="100%" minW={0} display="block">
       {data.title && (
         <Text fontSize="sm" fontWeight="600" mb={2} color={titleColor}>
           {data.title}
         </Text>
       )}
-      <Box ref={containerRef} w="full" display="block">
-        {width > 0 && (
-          <ChartComp {...commonProps} width={width} height={280}>
+      <Box w="100%" h="300px" minW={0}>
+        <ResponsiveContainer width="100%" height="100%">
+          <ChartComp {...commonProps}>
             {axes}
             {series}
           </ChartComp>
-        )}
+        </ResponsiveContainer>
       </Box>
     </Box>
   );
